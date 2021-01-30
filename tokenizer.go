@@ -95,10 +95,7 @@ func (t *Tokenizer) nextNoneSpaceChar() (byte, error) {
 }
 
 func (t *Tokenizer) readNumber() Token {
-	err := t.reader.UnreadByte()
-	if err != nil {
-		panic(err)
-	}
+	mustUnreadByte(t)
 
 	numStr := ""
 	for {
@@ -110,16 +107,14 @@ func (t *Tokenizer) readNumber() Token {
 		if b >= 48 && b <= 57 {
 			numStr += string(b)
 		} else {
+			mustUnreadByte(t)
 			return newToken(Number, numStr)
 		}
 	}
 }
 
 func (t *Tokenizer) readNull() Token {
-	err := t.reader.UnreadByte()
-	if err != nil {
-		panic(err)
-	}
+	mustUnreadByte(t)
 
 	// Skip 4 byte
 	for i := 0; i < 4; i++ {
@@ -132,10 +127,7 @@ func (t *Tokenizer) readNull() Token {
 }
 
 func (t *Tokenizer) readBool() Token {
-	err := t.reader.UnreadByte()
-	if err != nil {
-		panic(err)
-	}
+	mustUnreadByte(t)
 
 	b, err := t.reader.ReadByte()
 	if err != nil {
@@ -170,5 +162,12 @@ func (t *Tokenizer) readString() Token {
 func skip(r *strings.Reader, n int) {
 	for i := 0; i < n; i++ {
 		_, _ = r.ReadByte()
+	}
+}
+
+func mustUnreadByte(t *Tokenizer) {
+	err := t.reader.UnreadByte()
+	if err != nil {
+		panic(err)
 	}
 }
