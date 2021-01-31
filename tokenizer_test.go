@@ -1,14 +1,142 @@
 package jsonparser
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestTokenizer(t *testing.T) {
-	tokenizer := NewTokenizer(`{"min_position":7,"has_more_items":false,"items_html":"Bike","new_latent_count":0,"data":{"length":26,"text":"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."},"numericalArray":[23,28,23,27,31],"StringArray":["Nitrogen","Nitrogen","Carbon","Nitrogen"],"multipleTypesArray":3,"objArray":[{"class":"upper","age":3},{"class":"upper","age":0},{"class":"middle","age":7},{"class":"upper","age":2},{"class":"middle","age":0}]}`)
-	tokenizer.Tokenize()
-	for _, token := range tokenizer.Tokens {
-		fmt.Printf("%s\n", token.Value)
+	tests := []struct {
+		name string
+		json string
+		want []Token
+	}{
+		{
+			name: "Complex test",
+			json: `{"min_position":7,"has_more_items":false,"items_html":"Bike","new_latent_count":0,"data":{"length":26,"text":"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."},"numericalArray":[23,28,23,27,31],"StringArray":["Nitrogen","Nitrogen","Carbon","Nitrogen"],"multipleTypesArray":3,"objArray":[{"class":"upper","age":3},{"class":"upper","age":0},{"class":"middle","age":7},{"class":"upper","age":2},{"class":"middle","age":0}]}`,
+			want: []Token{
+				newToken(BeginObject, "{"),
+				newToken(String, "min_position"),
+				newToken(SepColon, ":"),
+				newToken(Number, "7"),
+				newToken(SepComma, ","),
+				newToken(String, "has_more_items"),
+				newToken(SepColon, ":"),
+				newToken(Bool, "false"),
+				newToken(SepComma, ","),
+				newToken(String, "items_html"),
+				newToken(SepColon, ":"),
+				newToken(String, "Bike"),
+				newToken(SepComma, ","),
+				newToken(String, "new_latent_count"),
+				newToken(SepColon, ":"),
+				newToken(Number, "0"),
+				newToken(SepComma, ","),
+				newToken(String, "data"),
+				newToken(SepColon, ":"),
+				newToken(BeginObject, "{"),
+				newToken(String, "length"),
+				newToken(SepColon, ":"),
+				newToken(Number, "26"),
+				newToken(SepComma, ","),
+				newToken(String, "text"),
+				newToken(SepColon, ":"),
+				newToken(String, "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."),
+				newToken(EndObject, "}"),
+				newToken(SepComma, ","),
+				newToken(String, "numericalArray"),
+				newToken(SepColon, ":"),
+				newToken(BeginArray, "["),
+				newToken(Number, "23"),
+				newToken(SepComma, ","),
+				newToken(Number, "28"),
+				newToken(SepComma, ","),
+				newToken(Number, "23"),
+				newToken(SepComma, ","),
+				newToken(Number, "27"),
+				newToken(SepComma, ","),
+				newToken(Number, "31"),
+				newToken(EndArray, "]"),
+				newToken(SepComma, ","),
+				newToken(String, "StringArray"),
+				newToken(SepColon, ":"),
+				newToken(BeginArray, "["),
+				newToken(String, "Nitrogen"),
+				newToken(SepComma, ","),
+				newToken(String, "Nitrogen"),
+				newToken(SepComma, ","),
+				newToken(String, "Carbon"),
+				newToken(SepComma, ","),
+				newToken(String, "Nitrogen"),
+				newToken(EndArray, "]"),
+				newToken(SepComma, ","),
+				newToken(String, "multipleTypesArray"),
+				newToken(SepColon, ":"),
+				newToken(Number, "3"),
+				newToken(SepComma, ","),
+				newToken(String, "objArray"),
+				newToken(SepColon, ":"),
+				newToken(BeginArray, "["),
+				newToken(BeginObject, "{"),
+				newToken(String, "class"),
+				newToken(SepColon, ":"),
+				newToken(String, "upper"),
+				newToken(SepComma, ","),
+				newToken(String, "age"),
+				newToken(SepColon, ":"),
+				newToken(Number, "3"),
+				newToken(EndObject, "}"),
+				newToken(SepComma, ","),
+				newToken(BeginObject, "{"),
+				newToken(String, "class"),
+				newToken(SepColon, ":"),
+				newToken(String, "upper"),
+				newToken(SepComma, ","),
+				newToken(String, "age"),
+				newToken(SepColon, ":"),
+				newToken(Number, "0"),
+				newToken(EndObject, "}"),
+				newToken(SepComma, ","),
+				newToken(BeginObject, "{"),
+				newToken(String, "class"),
+				newToken(SepColon, ":"),
+				newToken(String, "middle"),
+				newToken(SepComma, ","),
+				newToken(String, "age"),
+				newToken(SepColon, ":"),
+				newToken(Number, "7"),
+				newToken(EndObject, "}"),
+				newToken(SepComma, ","),
+				newToken(BeginObject, "{"),
+				newToken(String, "class"),
+				newToken(SepColon, ":"),
+				newToken(String, "upper"),
+				newToken(SepComma, ","),
+				newToken(String, "age"),
+				newToken(SepColon, ":"),
+				newToken(Number, "2"),
+				newToken(EndObject, "}"),
+				newToken(SepComma, ","),
+				newToken(BeginObject, "{"),
+				newToken(String, "class"),
+				newToken(SepColon, ":"),
+				newToken(String, "middle"),
+				newToken(SepComma, ","),
+				newToken(String, "age"),
+				newToken(SepColon, ":"),
+				newToken(Number, "0"),
+				newToken(EndObject, "}"),
+				newToken(EndArray, "]"),
+				newToken(EndObject, "}"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t1 *testing.T) {
+			tokenizer := NewTokenizer(tt.json)
+			tokenizer.Tokenize()
+
+			assert.Equal(t1, tt.want, tokenizer.Tokens)
+		})
 	}
 }

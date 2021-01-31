@@ -14,7 +14,7 @@ const (
 	NULL
 	Number
 	String
-	Boolean
+	Bool
 	SepColon
 	SepComma
 	EndDocument
@@ -41,6 +41,7 @@ func NewTokenizer(input string) *Tokenizer {
 	}
 }
 
+// Tokenize tokenize json string
 func (t *Tokenizer) Tokenize() {
 	for {
 		token := t.nextToken()
@@ -136,13 +137,13 @@ func (t *Tokenizer) readBool() Token {
 
 	// "true" starts with t
 	if b == 't' {
-		skip(t.reader, 4)
-		return newToken(Boolean, "true")
+		skip(t.reader, 3)
+		return newToken(Bool, "true")
 	}
 
 	// "false“ Obviously
-	skip(t.reader, 5)
-	return newToken(Boolean, "false")
+	skip(t.reader, 4)
+	return newToken(Bool, "false")
 }
 
 func (t *Tokenizer) readString() Token {
