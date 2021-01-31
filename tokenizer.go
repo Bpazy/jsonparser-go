@@ -116,14 +116,7 @@ func (t *Tokenizer) readNumber() Token {
 
 func (t *Tokenizer) readNull() Token {
 	mustUnreadByte(t)
-
-	// Skip 4 byte
-	for i := 0; i < 4; i++ {
-		if _, err := t.reader.ReadByte(); err != nil {
-			panic(err)
-		}
-	}
-
+	skip(t.reader, 4)
 	return newToken(Null, "null")
 }
 
