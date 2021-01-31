@@ -11,7 +11,7 @@ const (
 	EndObject
 	BeginArray
 	EndArray
-	NULL
+	Null
 	Number
 	String
 	Bool
@@ -124,7 +124,7 @@ func (t *Tokenizer) readNull() Token {
 		}
 	}
 
-	return newToken(NULL, "null")
+	return newToken(Null, "null")
 }
 
 func (t *Tokenizer) readBool() Token {
